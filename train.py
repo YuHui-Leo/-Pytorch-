@@ -10,7 +10,7 @@ from model import *
 # 定义训练的设备
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# 准备数据集
+# 准备数据集，root=""后面跟的是数据集储存的地址，请自己创建一个data文件夹方便储存
 train_data = torchvision.datasets.CIFAR10(root="./data",train=True,transform=torchvision.transforms.ToTensor(),
                                           download=True)
 test_data = torchvision.datasets.CIFAR10(root="./data",train=False,transform=torchvision.transforms.ToTensor(),
@@ -44,10 +44,8 @@ total_train_step = 0
 # 记录测试的次数
 total_test_step = 0
 # 训练的轮数
-epoch = 1000
+epoch = 10   #该次数可以自由更改
 
-# 添加tensorboard
-writer = SummaryWriter("./logs_train")
 
 start_time = time.time()
 
@@ -73,7 +71,7 @@ for i in range(epoch):
             end_time = time.time()
             print(end_time - start_time)
             print("训练次数：{}, loss:{}".format(total_train_step, loss.item()))
-            writer.add_scalar("train_loss",loss.item(),total_train_step)
+        
 
     # 测试步骤开始
     yuhui.eval()
@@ -92,9 +90,8 @@ for i in range(epoch):
     print("整体测试集上的Loss:{}".format(total_test_loss))
     print("整体测试集上的正确率:{}".format(total_accuracy/test_data_size))
     total_test_step = total_test_step + 1
-    writer.add_scalar("test_loss",total_test_loss,total_test_step)
-    writer.add_scalar("test_accuracy",total_accuracy/test_data_size,total_test_step)
 
+    # 将模型保存在model文件夹内，这个文件夹请自己创建
     torch.save(yuhui,"./model/yuhui_{}.pth".format(i))
     # torch.save(yuhui.state_dict(),"yuhui_{}.pth".format(i))
     print("模型已保存")
